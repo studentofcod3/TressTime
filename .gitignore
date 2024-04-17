@@ -1,0 +1,10 @@
+# Default ignored files
+/shelf/
+/.idea/
+
+# Byte-compiled files
+__pycache__/
+*.pyc
+
+# Build files
+*staticfiles*
