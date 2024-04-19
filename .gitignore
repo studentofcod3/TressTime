@@ -9,3 +9,6 @@ __pycache__/
 # Build files
 *staticfiles*
 *build*
+
+# Security
+*.env
