@@ -35,7 +35,32 @@ Install the package manager Homebrew if you do not have it already (instructions
 
 ### Installing python requirements
 
-You can set up your virtual environment using `virtualenv`. 
+**Installing python**
+
+You can manage your python environments using pyenv (Or the tool of your choice)
+```commandline
+brew update
+brew install pyenv
+```
+Add the following to your shell configuration file (.bashrc, .zshrc, etc.):
+```
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv virtualenv-init -)"
+```
+Source your profile file to apply the changes:
+```
+source ~/.bash_profile  # If you are using bash
+source ~/.zshrc          # If you are using zsh
+```
+Install the python file defined in the `.python-version` file:
+```
+pyenv install {python-version}
+```
+
+**Virtual environment**
+
+You can set up your virtual environment using `virtualenv` (Or the tool of your choice). 
 In the root directory of the project, simply run:
 ``` commandline
 brew install virtualenv
