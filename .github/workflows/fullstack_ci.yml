@@ -1,0 +1,95 @@
+name: Fullstack CI
+
+# Defines when the workflow should run
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'django_app/**'
+      - 'react_app/**'
+      - '.github/workflows/fullstack_ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'django_app/**'
+      - 'react_app/**'
+      - '.github/workflows/fullstack_ci.yml'
+
+# Defines the jobs to run
+jobs:
+  build-and-test:
+    # Specifies the type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Setting up PostgreSQL as a service that the tests can use
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_DB: myproject
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+        ports:
+          - 5432:5432
+        # Ensure that the PostgreSQL service is ready and healthy before proceeding with the rest of the CI steps
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2 # Checks-out the repository, so the job can access it
+
+    - name: Set up Node.js for React
+      uses: actions/setup-node@v3
+      with:
+        node-version-file: '.nvmrc' # ensure node is consistent across environments
+
+    - name: Build React app and move build output
+      run: |
+        cd react_app
+        npm install # Install Node dependencies
+        npm run build  # Custom script to build React and move output to Django static directory (see package.json)
+
+    - name: Read Python version # Manually read python version from file since GitHub Actions does not yet support this.
+      id: python-version
+      run: echo "::set-output name=version::$(cat .python-version)"
+
+    - name: Set up Python for Django
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ steps.python-version.outputs.version }} # Ensure python is consistent across environments
+
+    - name: Install Django dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run database migrations
+      env:
+        DJANGO_SETTINGS_MODULE: django_app.settings
+        DB_NAME: 'myproject'
+        DB_USER: 'testuser'
+        DB_PASSWORD: 'testpass'
+        DB_HOST: 'localhost'
+        DB_PORT: 5432
+        SECRET_KEY: 'ThisIsATestSecretKeyForCI'
+        DEBUG: False
+      run: |
+        cd django_app
+        python manage.py migrate
+
+    - name: Run Django tests
+      env:
+        DJANGO_SETTINGS_MODULE: django_app.settings
+        DB_NAME: 'myproject'
+        DB_USER: 'testuser'
+        DB_PASSWORD: 'testpass'
+        DB_HOST: 'localhost'
+        DB_PORT: 5432
+        SECRET_KEY: 'ThisIsATestSecretKeyForCI'
+        DEBUG: False
+      run: |
+        cd django_app
+        python manage.py test

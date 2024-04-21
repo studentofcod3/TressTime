@@ -8,7 +8,7 @@ __pycache__/
 
 # Build files
 *staticfiles*
-*build*
+*build/
 
 # Security
 *.env

@@ -35,7 +35,32 @@ Install the package manager Homebrew if you do not have it already (instructions
 
 ### Installing python requirements
 
-You can set up your virtual environment using `virtualenv`. 
+**Installing python**
+
+You can manage your python environments using pyenv (Or the tool of your choice)
+```commandline
+brew update
+brew install pyenv
+```
+Add the following to your shell configuration file (.bashrc, .zshrc, etc.):
+```
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv virtualenv-init -)"
+```
+Source your profile file to apply the changes:
+```
+source ~/.bash_profile  # If you are using bash
+source ~/.zshrc          # If you are using zsh
+```
+Install the python file defined in the `.python-version` file:
+```
+pyenv install {python-version}
+```
+
+**Virtual environment**
+
+You can set up your virtual environment using `virtualenv` (Or the tool of your choice). 
 In the root directory of the project, simply run:
 ``` commandline
 brew install virtualenv
@@ -92,6 +117,44 @@ print(new_secret_key)
 ```
 
 ### Frontend
+
+**Node Version Manager**  
+This project uses Node Version Manager (NVM) to manage node versions. Install nvm, replacing the variable with the latest version:
+
+`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{most_recent_stable_nvm}/install.sh | bash`
+
+The most recent stable nvm version can be found [here](https://github.com/nvm-sh/nvm).
+
+The above script clones the NVM repository from GitHub to ~/.nvm and adds the source line to your profile 
+(~/.bash_profile, ~/.zshrc, ~/.profile, or ~/.bashrc)
+
+Source your profile file to apply the changes:
+```commandline
+source ~/.bash_profile  # If you are using bash
+source ~/.zshrc          # If you are using zsh
+```
+This command loads the nvm script into your session, enabling you to use nvm commands.
+
+To confirm that nvm has been installed correctly, use:  
+```
+nvm --version
+```
+This command should return the version of nvm that you have installed.
+
+**Node**  
+Once nvm is installed, you can install Node.js. To install a specific version of Node.js, use:  
+```commandline
+nvm install {project_version_number}
+```
+The `project_version_number` can be found in the `.nvmrc` file in the root of the project.   
+Next run:  
+```
+nvm use {project_version_number}
+```
+Ensuring that the returned version matches that defined in the `.nvmrc` file. Node should now be ready to use for
+this project.
+
+**Frontend build**
 
 The frontend needs to be compiled. From the root of the project:
 
