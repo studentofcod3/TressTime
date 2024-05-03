@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Custom modules
+    'appointments',
+    'services',
     'users',
     # Other apps
     'django_extensions',
