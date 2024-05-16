@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Custom modules
     'appointments',
+    'notifications',
     'services',
     'users',
     # Other apps
