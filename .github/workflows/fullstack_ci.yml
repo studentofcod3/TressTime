@@ -62,8 +62,9 @@ jobs:
       with:
         python-version: ${{ steps.python-version.outputs.version }} # Ensure python is consistent across environments
 
-    - name: Install Django dependencies
+    - name: Install Python dependencies
       run: |
+        pip install pytest pytest-cov
         pip install -r requirements.txt
 
     - name: Run database migrations
@@ -80,7 +81,7 @@ jobs:
         cd django_app
         python manage.py migrate
 
-    - name: Run Django tests
+    - name: Run backend tests
       env:
         DJANGO_SETTINGS_MODULE: django_app.settings
         DB_NAME: 'myproject'
@@ -92,4 +93,8 @@ jobs:
         DEBUG: False
       run: |
         cd django_app
-        python manage.py test
+        pytest --cov=.
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
