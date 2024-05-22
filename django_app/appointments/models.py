@@ -8,15 +8,24 @@ from users.models import CustomUser
 
 class Appointment(models.Model):
     """
-    Represents bookings made by users for services.
+    Represents a scheduled appointment for a service provided by the hairdressing business.
 
-    ## Place within the system
-    Core Component. Fundamental to the core buses logic of the hairdressing booking system.
+    Attributes:
+        id (UUIDField): A unique identifier for each appointment.
+        created_at (DateTimeField): The timestamp when the appointment was created.
+        updated_at (DateTimeField): The timestamp when the appointment was last updated.
+        starts_at (DateTimeField): The date and time when the appointment is scheduled to take begin.
+        ends_at (DateTimeField): The date and time when the appointment is scheduled to take end.
+        status (CharField): The current status of the appointment, e.g., 'scheduled', 'completed', 'canceled'.
+        confirmation_number: A unique confirmation code sent to customers, e.g, for tracking appointments, verifying bookings etc.
+        notes (CharField): Optional notes or special instructions related to the appointment.
+        user (ForeignKey): A reference to the user who booked the appointment. Linked to the CustomUser model.
+        service (ForeignKey): A reference to the service that has been booked for the appointment. Linked to the Service model.
 
     Relationships:
-    - many-to-one with user
-    - many-to-one with service
-    - one-to-many with Notification (Relationship defined in Notification data model)
+        - many-to-one with User
+        - many-to-one with Service
+        - one-to-many with Notification (Relationship defined in Notification data model)
 
     ## Validation
     Only database level validation should be defined in this class.

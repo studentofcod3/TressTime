@@ -6,40 +6,40 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     """
-    Represents individuals who interact with the application. This includes staff, customers and admins.
+    Represents individuals who interact with the application.
 
-    ## Place withing the system
-    Core component. Has a central role in user management, authentication and authorization within the application.
+    This includes customers who book services, as well as staff and administrators who manage the system.
+    
+    Most of the needed fields are covered by AbstractUser, with only some minor adjustments. 
+    The name 'CustomUser' is used so as not to clash with Django's built-in User model.
+
+    Attributes (Includes inherited fields currently utilised in this project):
+        id (UUIDField): A unique identifier for each user.
+        created_at (DateTimeField): The timestamp when the user was created.
+        updated_at (DateTimeField): The timestamp when the user was last updated.
+        username (CharField): The unique username of the user (override declared here - original definition in AbstractUser).
+        email (EmailField): The email address of the user (override declared here - original definition in AbstractBaseUser).
+        password (CharField): The hashed password of the user (override declared here - original definition in AbstractBaseUser).
+        first_name (CharField): The first name of the user (original definition in AbstractUser).
+        last_name (CharField): The last name of the user (original definition in AbstractUser).
+        date_joined (DateTimeField): The date and time when the user registered (original definition in AbstractUser).
+        last_login (DateTimeField): The date and time of the user's last login (original definition in AbstractBaseUser).
+        profile_picture (ImageField): An optional profile picture for the user.
+        is_staff (BooleanField): Whether the user can access the admin site (original definition in AbstractUser).
+        is_active (BooleanField): Whether the user's account is active (original definition in AbstractUser).
+        is_superuser (BooleanField): Whether the user's account has all permissions (original definition in PermissionsMixin).
 
     Relationships:
-    - one-to-many with Appointment
-    - one-to-many with Notification
-    - one-to-many with PaymentDetails
-    - one-to-many with PaymentMethod
-    - one-to-many with BillingAddress
+        - one-to-many with Appointment (Relationship defined in Appointment data model)
+        - one-to-many with Notification (Relationship defined in Notification data model)
+        - many-to-many with Group (override declared here)
+        - many-to-many with Permission (override declared here)
 
     ## Validation
     Although some of the fields are used at the form level (which will require validation),
     we need to ensure that we do not violate any of the SOLID principles. Therefore, a decision has been made to
     only enforce database level validation (ie: 'null' property), and not utilise django's
     built in form level validation (ie: required/blank). This is the same across all data models.
-
-    ## Override information
-    The name CustomUser is defined so as not to clash with Django's built-in User model.
-
-    Most of the needed fields are covered by AbstractUser, with only some minor adjustments. The list below contains
-    information on which inherited fields are currently utilised in this project:
-
-    username - overridden (definition: AbstractUser)
-    email - overridden (definition: AbstractBaseUser)
-    password - overridden (definition: AbstractBaseUser)
-    first_name - full coverage (definition: AbstractUser)
-    last_name - full coverage (definition: AbstractUser)
-    date_joined - full coverage, technically a datetime field (definition: AbstractUser)
-    last_login - full coverage, technically a datetime field (definition: AbstractBaseUser)
-    is_active - full coverage (definition: AbstractUser)
-    is_staff - full coverage (definition: AbstractUser)
-    is_superuser - full coverage (definition PermissionsMixin)
     """
 
     # TODO: The logic for preventing editing of id will be addressed when implementing the repository pattern

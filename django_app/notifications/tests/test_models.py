@@ -44,7 +44,7 @@ class TestNotification:
         """
         Creates the required foreign entities to allow notification entity creation.
 
-        Returns: User, Appointment
+        Returns: User
         """
 
         user = CustomUser.objects.create(
@@ -52,21 +52,8 @@ class TestNotification:
             email=self.email,
             password=self.password
         )
-        service = Service.objects.create(
-            name=self.name,
-            description=self.description,
-            duration=self.duration,
-            price=self.price
-        )
-        appointment = Appointment.objects.create(
-            starts_at=self.starts_at,
-            ends_at=self.ends_at,
-            status=self.appointment_status,
-            user=user,
-            service=service,
-        )
 
-        return user, appointment
+        return user
     
     def test_minimal_required_fields_present(self):
         """
@@ -74,15 +61,14 @@ class TestNotification:
 
         Some of the required fields have default values, this test confirms they are present post creation.
         """
-        user, appointment = self.create_notification_entity_dependencies()
+        user = self.create_notification_entity_dependencies()
         notification = Notification.objects.create(
             type=self.notification_type,
             status=self.notification_status,
             message=self.notification_message,
             scheduled_send_datetime=self.notification_scheduled_send_datetime,
             priority=self.notification_priority,
-            user=user,
-            appointment=appointment
+            user=user
         )
         assert notification.id
         assert notification.created_at
@@ -92,7 +78,6 @@ class TestNotification:
         assert notification.scheduled_send_datetime == self.notification_scheduled_send_datetime
         assert notification.priority == self.notification_priority
         assert notification.user == user
-        assert notification.appointment == appointment
 
     @pytest.mark.parametrize(
             'notification_id,created_at,updated_at,missing_value',
@@ -113,7 +98,7 @@ class TestNotification:
         - created_at
         - updated_at
         """
-        user, appointment = self.create_notification_entity_dependencies()
+        user = self.create_notification_entity_dependencies()
 
         notification = Notification.objects.create(
             # Required fields - Non overridable defaults
@@ -127,21 +112,19 @@ class TestNotification:
             scheduled_send_datetime=self.notification_scheduled_send_datetime,
             priority=self.notification_priority,
             user=user,
-            appointment=appointment
         )
         assert getattr(notification, missing_value)
 
     @pytest.mark.parametrize(
             'notification_type,notification_status,notification_message,notification_scheduled_send_datetime,\
-                notification_priority,existing_user,existing_appointment,missing_value',
+                notification_priority,existing_user,missing_value',
             [
-                (None,notification_status,notification_message,notification_scheduled_send_datetime,notification_priority,True,True,'type'),
-                (notification_type,None,notification_message,notification_scheduled_send_datetime,notification_priority,True,True,'status'),
-                (notification_type,notification_status,None,notification_scheduled_send_datetime,notification_priority,True,True,'message'),
-                (notification_type,notification_status,notification_message,None,notification_priority,True,True,'scheduled_send_datetime'),
-                (notification_type,notification_status,notification_message,notification_scheduled_send_datetime,None,True,True,'priority'),
-                (notification_type,notification_status,notification_message,notification_scheduled_send_datetime,notification_priority,False,True,'user_id'),
-                (notification_type,notification_status,notification_message,notification_scheduled_send_datetime,notification_priority,True,False,'appointment_id'),
+                (None,notification_status,notification_message,notification_scheduled_send_datetime,notification_priority,True,'type'),
+                (notification_type,None,notification_message,notification_scheduled_send_datetime,notification_priority,True,'status'),
+                (notification_type,notification_status,None,notification_scheduled_send_datetime,notification_priority,True,'message'),
+                (notification_type,notification_status,notification_message,None,notification_priority,True,'scheduled_send_datetime'),
+                (notification_type,notification_status,notification_message,notification_scheduled_send_datetime,None,True,'priority'),
+                (notification_type,notification_status,notification_message,notification_scheduled_send_datetime,notification_priority,False,'user_id'),
             ]
     )
     def test_required_fields_missing(
@@ -152,7 +135,6 @@ class TestNotification:
             notification_scheduled_send_datetime, 
             notification_priority, 
             existing_user, 
-            existing_appointment, 
             missing_value
             ):
         """
@@ -165,9 +147,8 @@ class TestNotification:
             - Add a new parameter above, following the pattern used.
             - Add a row in the 'create' query.
         """
-        user, appointment = self.create_notification_entity_dependencies()
+        user = self.create_notification_entity_dependencies()
         user = user if existing_user else None
-        appointment = appointment if existing_appointment else None
 
         with pytest.raises(IntegrityError) as missing_column_error:
             Notification.objects.create(
@@ -177,7 +158,6 @@ class TestNotification:
                 scheduled_send_datetime=notification_scheduled_send_datetime,
                 priority=notification_priority,
                 user=user,
-                appointment=appointment
             )
         assert 'violates not-null constraint' in str(missing_column_error._excinfo)
         assert f'null value in column "{missing_value}"' in str(missing_column_error)
@@ -188,7 +168,7 @@ class TestNotification:
 
         ALL fields with the 'unique' constraint set should be tested here (currently, this is just the primary key).
         """
-        user, appointment = self.create_notification_entity_dependencies()
+        user = self.create_notification_entity_dependencies()
         notification = Notification.objects.create(
             type=self.notification_type,
             status=self.notification_status,
@@ -196,7 +176,6 @@ class TestNotification:
             scheduled_send_datetime=self.notification_scheduled_send_datetime,
             priority=self.notification_priority,
             user=user,
-            appointment=appointment
         )
 
         with pytest.raises(IntegrityError) as unique_contraint_violation_error:
@@ -210,9 +189,37 @@ class TestNotification:
                 scheduled_send_datetime=self.notification_scheduled_send_datetime,
                 priority=self.notification_priority,
                 user=user,
-                appointment=appointment
             )
         
         assert "duplicate key value violates unique constraint" in str(unique_contraint_violation_error)
         assert (f"Key (id)=({getattr(notification, 'id')}) already exists"
                 in str(unique_contraint_violation_error))
+
+    def test_optional_relationship(self):
+        """Test that any optional relationships are correctly added upon creation"""
+        user = self.create_notification_entity_dependencies()
+        service = Service.objects.create(
+            name=self.name,
+            description=self.description,
+            duration=self.duration,
+            price=self.price
+        )
+        appointment = Appointment.objects.create(
+            starts_at=self.starts_at,
+            ends_at=self.ends_at,
+            status=self.appointment_status,
+            user=user,
+            service=service,
+        )
+        notification = Notification.objects.create(
+            type=self.notification_type,
+            status=self.notification_status,
+            message=self.notification_message,
+            scheduled_send_datetime=self.notification_scheduled_send_datetime,
+            priority=self.notification_priority,
+            user=appointment.user,
+            appointment=appointment
+        )
+        assert notification.appointment == appointment
+        assert notification.user == user
+        assert notification.appointment.service == service
