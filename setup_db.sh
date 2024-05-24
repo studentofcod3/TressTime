@@ -20,4 +20,5 @@ dbname="tresstime_db"
 createdb $dbname
 psql -d $dbname -c "CREATE USER $dbuser WITH ENCRYPTED PASSWORD '$dbpass';"
 psql -d $dbname -c "GRANT ALL PRIVILEGES ON DATABASE $dbname TO $dbuser;"
+psql -d $dbname -c "ALTER ROLE $dbuser CREATEDB"
 echo "Database and user created successfully."
