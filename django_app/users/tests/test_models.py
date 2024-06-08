@@ -77,6 +77,7 @@ class TestCustomUserModel:
             # Required fields - Non overridable defaults
             id=user_id,
             created_at=created_at,
+            updated_at=updated_at,
             # Required fields - No defaults
             username=self.username,
             email=self.email,
