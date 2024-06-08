@@ -8,6 +8,36 @@ from users.models import CustomUser
 
 
 class TestUserRepository:
+    """
+    Test suite for the UserRepository class.
+
+    This test suite ensures that the UserRepository class adheres to its contract and correctly implements all CRUD
+    (Create, Read, Update, Delete) operations for the User model. The tests verify the behavior of the repository
+    methods using the unittest.mock library to mock Django's ORM interactions, allowing isolated and controlled testing.
+
+    Fixtures:
+        mock_user: Provides a mocked instance of the CustomUser model.
+        user_repository: Provides an instance of the UserRepository class for testing.
+
+    Tests:
+        - test_get_user_by_id
+        - test_get_user_by_id_not_found
+        - test_get_all_users
+        - test_create_user
+        - test_create_user_invalid_data
+        - test_update_user
+        - test_update_user_with_invalid_data
+        - test_update_user_not_found
+        - test_delete_user
+        - test_delete_user_not_found
+
+    The tests utilize unittest.mock to patch Django ORM methods, allowing for the simulation of database interactions without
+    requiring an actual database. This approach provides faster and more reliable tests by isolating the repository logic
+    from the database layer.
+
+    By running this test suite, we can ensure that the UserRepository class functions correctly and adheres to its expected
+    behavior, maintaining the integrity and reliability of user data operations in the application.
+    """
 
     @pytest.fixture
     def mock_user(self):
@@ -20,7 +50,7 @@ class TestUserRepository:
         return UserRepository()
     
     def test_get_user_by_id(self, mock_user, user_repository):
-        """Ensures get_user_by_id calls User.objects.get with the correct parameters and returns the mock user."""
+        """Ensures that the get_user_by_id method retrieves a user by ID correctly."""
         user_id = 'some-unique-id'
         with patch.object(CustomUser.objects, 'get', return_value=mock_user) as mock_get:
             user = user_repository.get_user_by_id(user_id)
@@ -28,14 +58,14 @@ class TestUserRepository:
             assert user == mock_user
 
     def test_get_user_by_id_not_found(self, user_repository):
-        """Ensures get_user_by_id handles User.DoesNotExist correctly."""
+        """Ensures that the get_user_by_id method handles the case where a user is not found."""
         user_id = 'non-existent-id'
         with patch.object(CustomUser.objects, 'get', side_effect=CustomUser.DoesNotExist):
             user = user_repository.get_user_by_id(user_id)
             assert user is None
         
     def test_get_all_users(self, mock_user, user_repository):
-        """Checks that get_all_users calls the 'all' method exactly once and returns the expected list of users."""
+        """Ensures that the get_all_users method retrieves all users correctly."""
         mock_users = [mock_user, mock_user]
         with patch.object(CustomUser.objects, 'all', return_value=mock_users) as mock_all:
             users = user_repository.get_all_users()
@@ -43,7 +73,7 @@ class TestUserRepository:
             assert users == mock_users
 
     def test_create_user(self, mock_user, user_repository):
-        """Ensures create_user calls User.objects.create with the correct parameters and returns the mock user."""
+        """Ensures that the create_user method handles user creation correctly."""
         user_data = {
             'username': 'testuser',
             'email': 'testuser@example.com',
@@ -67,7 +97,7 @@ class TestUserRepository:
             assert not user
 
     def test_update_user(self, mock_user, user_repository):
-        """Ensures update_user updates the user and saves it."""
+        """Ensures that the update_user method updates a user's details correctly."""
         user_id = 'some-unique-id'
         user_data = {
             'email': 'newemail@example.com'
@@ -92,7 +122,7 @@ class TestUserRepository:
             assert not user
 
     def test_update_user_not_found(self, user_repository):
-        """Ensures update_user handles User.DoesNotExist correctly."""
+        """Ensures that the update_user method handles the case where a user to be updated is not found."""
         user_id = 'non-existent-id'
         user_data = {
             'email': 'newemail@example.com'
@@ -102,7 +132,7 @@ class TestUserRepository:
             assert updated_user is None
 
     def test_delete_user(self, mock_user, user_repository):
-        """Ensures delete_user deletes the user and returns True."""
+        """Ensures that the delete_user method deletes a user by ID correctly."""
         user_id = 'some-unique-id'
         with patch.object(CustomUser.objects, 'get', return_value=mock_user):
             result = user_repository.delete_user(user_id)
@@ -110,7 +140,7 @@ class TestUserRepository:
             assert result is True
 
     def test_delete_user_not_found(self, user_repository):
-        """Ensures delete_user handles User.DoesNotExist correctly and returns False."""
+        """Ensures that the delete_user method handles the case where a user to be deleted is not found."""
         user_id = 'non-existent-id'
         with patch.object(CustomUser.objects, 'get', side_effect=CustomUser.DoesNotExist):
             result = user_repository.delete_user(user_id)

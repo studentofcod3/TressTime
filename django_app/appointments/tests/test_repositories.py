@@ -8,6 +8,36 @@ from appointments.repositories.appointment_repository import AppointmentReposito
 
 
 class TestAppointmentRepository:
+    """
+    Test suite for the AppointmentRepository class.
+
+    This test suite ensures that the AppointmentRepository class adheres to its contract and correctly implements all CRUD
+    (Create, Read, Update, Delete) operations for the Appointment model. The tests verify the behavior of the repository
+    methods using the unittest.mock library to mock Django's ORM interactions, allowing isolated and controlled testing.
+
+    Fixtures:
+        mock_appointment: Provides a mocked instance of the Appointment model.
+        appointment_repository: Provides an instance of the AppointmentRepository class for testing.
+
+    Tests:
+        - test_get_appointment_by_id
+        - test_get_appointment_by_id_not_found
+        - test_get_all_appointments
+        - test_create_appointment
+        - test_create_appointment_invalid_data
+        - test_update_appointment
+        - test_update_appointment_with_invalid_data
+        - test_update_appointment_not_found
+        - test_delete_appointment
+        - test_delete_appointment_not_found
+
+    The tests utilize unittest.mock to patch Django ORM methods, allowing for the simulation of database interactions without
+    requiring an actual database. This approach provides faster and more reliable tests by isolating the repository logic
+    from the database layer.
+
+    By running this test suite, we can ensure that the AppointmentRepository class functions correctly and adheres to its expected
+    behavior, maintaining the integrity and reliability of appointment data operations in the application.
+    """
     @pytest.fixture
     def mock_appointment(self):
         """A mock object for the Appointment model."""
@@ -19,7 +49,7 @@ class TestAppointmentRepository:
         return AppointmentRepository()
     
     def test_get_appointment_by_id(self, mock_appointment, appointment_repository):
-        """Ensures get_appointment_by_id calls Appointment.objects.get with the correct parameters and returns the mock appointment."""
+        """Ensures that the get_appointment_by_id method retrieves an appointment by ID correctly."""
         appointment_id = 'some-unique-id'
         with patch.object(Appointment.objects, 'get', return_value=mock_appointment) as mock_get:
             appointment = appointment_repository.get_appointment_by_id(appointment_id)
@@ -27,14 +57,14 @@ class TestAppointmentRepository:
             assert appointment == mock_appointment
 
     def test_get_appointment_by_id_not_found(self, appointment_repository):
-        """Ensures get_appointment_by_id handles Appointment.DoesNotExist correctly."""
+        """Ensures that the get_appointment_by_id method handles the case where a appointment is not found."""
         appointment_id = 'some-unique-id'
         with patch.object(Appointment.objects, 'get', side_effect=Appointment.DoesNotExist):
             appointment = appointment_repository.get_appointment_by_id(appointment_id)
             assert appointment is None
 
     def test_get_all_appointments(self, mock_appointment, appointment_repository):
-        """Checks that get_all_appointments calls Appointment.objects.all exactly once and returns the expected list of appointments."""
+        """Ensures that the get_all_appointments method retrieves all appointments correctly."""
         mock_appointments = [mock_appointment, mock_appointment]
         with patch.object(Appointment.objects, 'all', return_value=mock_appointments) as mock_all:
             appointments = appointment_repository.get_all_appointments()
@@ -42,7 +72,7 @@ class TestAppointmentRepository:
             assert appointments == mock_appointments
 
     def test_create_appointment(self, mock_appointment, appointment_repository):
-        """Ensures create_appointment calls Appointment.objects.create with the correct parameters and returns the appointment."""
+        """Ensures that the create_appointment method handles appointment creation correctly."""
         appointment_data = {
             'starts_at': 'The start time of the appointment',
             'ends_at': 'The end time of the appointment',
@@ -70,7 +100,7 @@ class TestAppointmentRepository:
             assert not appointment
 
     def test_update_appointment(self, mock_appointment, appointment_repository):
-        """Ensures update_appointment updates the appointment and saves it."""
+        """Ensures that the update_appointment method updates a appointment's details correctly."""
         appointment_id = 'some-unique-id'
         appointment_data = {
             'status': 'new status'
@@ -95,7 +125,7 @@ class TestAppointmentRepository:
             assert not appointment
 
     def test_update_appointment_not_found(self, appointment_repository):
-        """Ensures update_appointment handles Appointment.DoesNotExist correctly."""
+        """Ensures that the update_appointment method handles the case where a appointment to be updated is not found."""
         appointment_id = 'non-existent-id'
         appointment_data = {
             'email': 'newemail@example.com'
@@ -105,7 +135,7 @@ class TestAppointmentRepository:
             assert updated_appointment is None
 
     def test_delete_appointment(self, mock_appointment, appointment_repository):
-        """Ensures delete_appointment deletes the appointment and returns True."""
+        """Ensures that the delete_appointment method deletes a appointment by ID correctly."""
         appointment_id = 'some-unique-id'
         with patch.object(Appointment.objects, 'get', return_value=mock_appointment):
             result = appointment_repository.delete_appointment(appointment_id)
@@ -113,7 +143,7 @@ class TestAppointmentRepository:
             assert result is True
 
     def test_delete_appointment_not_found(self, appointment_repository):
-        """Ensures delete_appointment handles Appointment.DoesNotExist correctly and returns False."""
+        """Ensures that the delete_appointment method handles the case where a appointment to be deleted is not found."""
         appointment_id = 'non-existent-id'
         with patch.object(Appointment.objects, 'get', side_effect=Appointment.DoesNotExist):
             result = appointment_repository.delete_appointment(appointment_id)

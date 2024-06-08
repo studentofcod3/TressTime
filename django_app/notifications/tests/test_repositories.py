@@ -7,6 +7,37 @@ from notifications.models import Notification
 from notifications.repositories.notification_repository import NotificationRepository
 
 class TestNotificationRepository:
+    """
+    Test suite for the NotificationRepository class.
+
+    This test suite ensures that the NotificationRepository class adheres to its contract and correctly implements all CRUD
+    (Create, Read, Update, Delete) operations for the Notification model. The tests verify the behavior of the repository
+    methods using the unittest.mock library to mock Django's ORM interactions, allowing isolated and controlled testing.
+
+    Fixtures:
+        mock_notification: Provides a mocked instance of the Notification model.
+        notification_repository: Provides an instance of the NotificationRepository class for testing.
+
+    Tests:
+        - test_get_notification_by_id
+        - test_get_notification_by_id_not_found
+        - test_get_all_notifications
+        - test_create_notification
+        - test_create_notification_invalid_data
+        - test_update_notification
+        - test_update_notification_with_invalid_data
+        - test_update_notification_not_found
+        - test_delete_notification
+        - test_delete_notification_not_found
+
+    The tests utilize unittest.mock to patch Django ORM methods, allowing for the simulation of database interactions without
+    requiring an actual database. This approach provides faster and more reliable tests by isolating the repository logic
+    from the database layer.
+
+    By running this test suite, we can ensure that the NotificationRepository class functions correctly and adheres to its expected
+    behavior, maintaining the integrity and reliability of notification data operations in the application.
+    """
+
     @pytest.fixture
     def mock_notification(self):
         """A mock object for the Notification model."""
@@ -18,7 +49,7 @@ class TestNotificationRepository:
         return NotificationRepository()
     
     def test_get_notification_by_id(self, mock_notification, notification_repository):
-        """Ensures get_notification_by_id calls Notification.objects.get with the correct parameters and returns the mock notification."""
+        """Ensures that the get_notification_by_id method retrieves a notification by ID correctly."""
         notification_id = 'some-unique-id'
         with patch.object(Notification.objects, 'get', return_value=mock_notification) as mock_get:
             notification = notification_repository.get_notification_by_id(notification_id)
@@ -26,14 +57,14 @@ class TestNotificationRepository:
             assert notification == mock_notification
 
     def test_get_notification_by_id_not_found(self, notification_repository):
-        """Ensures get_notification_by_id handles Notification.DoesNotExist correctly."""
+        """Ensures that the get_notification_by_id method handles the case where a notification is not found."""
         notification_id = 'some-unique-id'
         with patch.object(Notification.objects, 'get', side_effect=Notification.DoesNotExist):
             notification = notification_repository.get_notification_by_id(notification_id)
             assert notification is None
 
     def test_get_all_notifications(self, mock_notification, notification_repository):
-        """Checks that get_all_notifications calls Notification.objects.all exactly once and returns the expected list of notifications."""
+        """Ensures that the get_all_notifications method retrieves all notifications correctly."""
         mock_notifications = [mock_notification, mock_notification]
         with patch.object(Notification.objects, 'all', return_value=mock_notifications) as mock_all:
             notifications = notification_repository.get_all_notifications()
@@ -41,7 +72,7 @@ class TestNotificationRepository:
             assert notifications == mock_notifications
 
     def test_create_notification(self, mock_notification, notification_repository):
-        """Ensures create_notification calls Notification.objects.create with the correct parameters and returns the notification."""
+        """Ensures that the create_notification method handles notification creation correctly."""
         notification_data = {
             'type': 'sms',
             'status': 'sent',
@@ -96,7 +127,7 @@ class TestNotificationRepository:
             assert not notification
 
     def test_update_notification_not_found(self, notification_repository):
-        """Ensures update_notification handles Notification.DoesNotExist correctly."""
+        """Ensures that the update_notification method handles the case where a notification to be updated is not found."""
         notification_id = 'non-existent-id'
         notification_data = {
             'scheduled_send_datetime': '16:28:40 05.07.2024'
@@ -106,7 +137,7 @@ class TestNotificationRepository:
             assert updated_notification is None
 
     def test_delete_notification(self, mock_notification, notification_repository):
-        """Ensures delete_notification deletes the notification and returns True."""
+        """Ensures that the delete_notification method deletes a notification by ID correctly."""
         notification_id = 'some-unique-id'
         with patch.object(Notification.objects, 'get', return_value=mock_notification):
             result = notification_repository.delete_notification(notification_id)
@@ -114,7 +145,7 @@ class TestNotificationRepository:
             assert result is True
 
     def test_delete_notification_not_found(self, notification_repository):
-        """Ensures delete_notification handles Notification.DoesNotExist correctly and returns False."""
+        """Ensures that the delete_notification method handles the case where a notification to be deleted is not found."""
         notification_id = 'non-existent-id'
         with patch.object(Notification.objects, 'get', side_effect=Notification.DoesNotExist):
             result = notification_repository.delete_notification(notification_id)
