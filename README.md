@@ -19,7 +19,18 @@ A platform for local businesses (Currently tailored to hairdressers but can be m
     - State Management: Redux / Context API _(TODO: decide which to use)_
   - **Database Management**: PostgreSQL
 
+## Principles
+This application aims to adhere to the SOLID principles of Object Oriented Design:
+
+- Single Responsibility Principle (SRP): Each layer has a single responsibility.
+- Open/Closed Principle (OCP): Business logic can be extended without modifying the model or repository layers.
+- Liskov Substitution Principle (LSP): Interfaces ensure that implementations can be substituted without affecting the correctness.
+- Interface Segregation Principle (ISP): Services and repositories depend on the interfaces they actually use.
+- Dependency Inversion Principle (DIP): High-level modules (services) depend on abstractions rather than low-level modules (repositories).
+
 ## Design Patterns:
+The design patterns below are being used in order to help us adhere to the SOLID principles.
+
 - **Repository Pattern**:
     - **Overview**: Mediates between the domain and data mapping layers, acting like an in-memory domain object collection.
     - **Utility**: Provides a cleaner way to access data from the database, making it easier to switch databases or data sources without affecting other parts of the application.
