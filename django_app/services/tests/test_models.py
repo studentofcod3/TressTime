@@ -1,8 +1,10 @@
+import pytest
 import uuid
+
 from datetime import datetime
 
-import pytest
 from django.db import IntegrityError
+from django.utils.timezone import make_aware as make_aware_of_timezone
 
 from services.models import Service
 
@@ -13,8 +15,8 @@ class TestServiceModel:
 
     # Field values
     service_id = uuid.uuid4()
-    created_at = datetime.now()
-    updated_at = datetime.now()
+    created_at = make_aware_of_timezone(datetime.now())
+    updated_at = make_aware_of_timezone(datetime.now())
     name = 'Cut, Wash and Dry'
     description = ("Indulge in our signature 'Wash, Cut & Dry' service, designed to pamper you from start to finish. "
                    "Relax and unwind as our skilled stylists begin with a soothing scalp massage during your wash, "

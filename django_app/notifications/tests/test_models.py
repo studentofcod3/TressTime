@@ -14,10 +14,12 @@ from notifications.models import Notification
 class TestNotification:
     """This tests the Notification entity at the database level"""
 
-    # Field values for Notification entity
-    notification_id = uuid.uuid4()
+    # Field values - Generic
     created_at = make_aware_of_timezone(datetime.now())
     updated_at = make_aware_of_timezone(datetime.now())
+
+    # Field values - Notification entity
+    notification_id = uuid.uuid4()
     notification_type = 'test_type'
     notification_status = 'test_status'
     notification_message = 'test message'
@@ -25,17 +27,17 @@ class TestNotification:
     notification_priority = 'test_priority'
 
 
-    # Field values for dependency objects:
-    # User
+    # Field values - Dependency objects:
+    ## User
     username = 'test_username'
     email = 'test_email'
     password = 'test_password'
-    # Service
+    ## Service
     name = 'Test Service Name'
     description = 'Test Service Description'
     duration = 60
     price = 50
-    # Appointment
+    ## Appointment
     starts_at = make_aware_of_timezone(datetime.now() + timedelta(days=1))
     ends_at = make_aware_of_timezone(datetime.now() + timedelta(days=1, hours=1))
     appointment_status = 'test_status'
@@ -48,6 +50,8 @@ class TestNotification:
         """
 
         user = CustomUser.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             username=self.username,
             email=self.email,
             password=self.password
