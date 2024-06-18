@@ -12,8 +12,7 @@ from notifications.models import Notification
 
 @pytest.mark.django_db
 class TestNotification:
-    """This tests the Notification entity at the database level"""
-
+    """This tests the Notification entity at the database level."""
     # Field values - Generic
     created_at = make_aware_of_timezone(datetime.now())
     updated_at = make_aware_of_timezone(datetime.now())
@@ -25,7 +24,6 @@ class TestNotification:
     notification_message = 'test message'
     notification_scheduled_send_datetime = make_aware_of_timezone(datetime.now())
     notification_priority = 'test_priority'
-
 
     # Field values - Dependency objects:
     ## User
@@ -203,6 +201,8 @@ class TestNotification:
         """Test that any optional relationships are correctly added upon creation"""
         user = self.create_notification_entity_dependencies()
         service = Service.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             name=self.name,
             description=self.description,
             duration=self.duration,

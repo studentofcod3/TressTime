@@ -49,6 +49,8 @@ class TestAppointment:
             password=self.password
         )
         service = Service.objects.create(
+            created_at=make_aware_of_timezone(datetime.now()),
+            updated_at=make_aware_of_timezone(datetime.now()),
             name=self.name,
             description=self.description,
             duration=self.duration,
