@@ -35,6 +35,8 @@ class TestServiceModel:
         Some of the required fields have default values, this test confirms they are present post creation.
         """
         service = Service.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             name=self.name,
             description=self.description,
             duration=self.duration,
@@ -49,15 +51,7 @@ class TestServiceModel:
         assert service.price == self.price
         assert service.availability == self.availability
 
-    @pytest.mark.parametrize(
-        'service_id,created_at,updated_at,missing_value',
-        [
-            (None, created_at, updated_at, 'id'),
-            (service_id, None, updated_at, 'created_at'),
-            (service_id, created_at, updated_at, 'updated_at'),
-        ]
-    )
-    def test_required_non_overridable_default_fields(self, service_id, created_at, updated_at, missing_value):
+    def test_required_non_overridable_default_fields(self):
         """Ensure required fields with non-overridable default values are always populated.
 
         Certain fields are populated even if explicitly set as Null. This is an extra precaution as there is no
@@ -65,33 +59,33 @@ class TestServiceModel:
 
         The current fields for which this is the case are:
         - id (primary key)
-        - created_at
-        - updated_at
         """
         service = Service.objects.create(
             # Required fields - Non overridable defaults
-            id=service_id,
-            created_at=created_at,
-            updated_at=updated_at,
+            id=None,
             # Required fields - No defaults
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             name=self.name,
             description=self.description,
             duration=self.duration,
             price=self.price
         )
-        assert getattr(service, missing_value)
+        assert getattr(service, 'id')
 
     @pytest.mark.parametrize(
-        'name,description,duration,price,availability,missing_value',
+        'created_at,updated_at,name,description,duration,price,availability,missing_value',
         [
-            (None, description, duration, price, availability, 'name'),
-            (name, None, duration, price, availability, 'description'),
-            (name, description, None, price, availability, 'duration'),
-            (name, description, duration, None, availability, 'price'),
-            (name, description, duration, price, None, 'availability'),
+            (None, updated_at, name, description, duration, price, availability, 'created_at'),
+            (created_at, None, name, description, duration, price, availability, 'updated_at'),
+            (created_at, updated_at, None, description, duration, price, availability, 'name'),
+            (created_at, updated_at, name, None, duration, price, availability, 'description'),
+            (created_at, updated_at, name, description, None, price, availability, 'duration'),
+            (created_at, updated_at, name, description, duration, None, availability, 'price'),
+            (created_at, updated_at, name, description, duration, price, None, 'availability'),
         ]
     )
-    def test_required_fields_missing(self, name, description, duration, price, availability, missing_value):
+    def test_required_fields_missing(self, created_at, updated_at, name, description, duration, price, availability, missing_value):
         """
             Each iteration attempts creation with a missing required field.
 
@@ -104,6 +98,8 @@ class TestServiceModel:
         """
         with pytest.raises(IntegrityError) as missing_column_error:
             Service.objects.create(
+                created_at=created_at,
+                updated_at=updated_at,
                 name=name,
                 description=description,
                 duration=duration,
@@ -132,6 +128,8 @@ class TestServiceModel:
         - Add a row in the 'create' query.
         """
         service = Service.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             name=self.name,
             description=self.description,
             duration=self.duration,
@@ -144,6 +142,8 @@ class TestServiceModel:
         with pytest.raises(IntegrityError) as unique_contraint_violation_error:
             Service.objects.create(
                 pk=service_id,
+                created_at=self.created_at,
+                updated_at=self.updated_at,
                 name=name,
                 description=self.description,
                 duration=self.duration,

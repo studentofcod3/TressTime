@@ -34,17 +34,15 @@ class Service(models.Model):
     Only database level validation should be defined in this class.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True, null=False)
-    updated_at = models.DateTimeField(auto_now=True, null=False)
+    created_at = models.DateTimeField(null=False)
+    updated_at = models.DateTimeField(null=False)
     name = models.CharField(
         default=None,
-        max_length=150,
         null=False,
         unique=True,
     )
     description = models.CharField(
         default=None,
-        max_length=2000,
         null=False,
     )
     duration = models.IntegerField(null=False)
