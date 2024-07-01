@@ -38,3 +38,10 @@ class AppointmentRepository(AppointmentRepositoryInterface):
             return True
         except Appointment.DoesNotExist:
             return False
+
+    def get_appointment_by_confirmation_number(self, confirmation_number):
+        try:
+            return Appointment.objects.filter(confirmation_number=confirmation_number)
+        except:
+            return None
+            
