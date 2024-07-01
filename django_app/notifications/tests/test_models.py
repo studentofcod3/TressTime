@@ -209,6 +209,8 @@ class TestNotification:
             price=self.price
         )
         appointment = Appointment.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             starts_at=self.starts_at,
             ends_at=self.ends_at,
             status=self.appointment_status,
