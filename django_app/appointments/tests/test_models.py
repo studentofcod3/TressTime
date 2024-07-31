@@ -42,11 +42,15 @@ class TestAppointment:
         """
 
         user = CustomUser.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             username=self.username,
             email=self.email,
             password=self.password
         )
         service = Service.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             name=self.name,
             description=self.description,
             duration=self.duration,
@@ -63,6 +67,8 @@ class TestAppointment:
         user, service = self.create_appointment_entity_dependencies()
 
         appointment = Appointment.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             starts_at=self.starts_at,
             ends_at=self.ends_at,
             status=self.status,
@@ -78,15 +84,7 @@ class TestAppointment:
         assert appointment.user == user
         assert appointment.service == service
 
-    @pytest.mark.parametrize(
-            'appointment_id,created_at,updated_at,missing_value',
-            [
-                (None,created_at,updated_at, 'id'),
-                (appointment_id,None,updated_at, 'created_at'),
-                (appointment_id,created_at,None, 'updated_at'),
-            ]
-    )
-    def test_required_non_overridable_default_fields(self, appointment_id, created_at, updated_at, missing_value):
+    def test_required_non_overridable_default_fields(self):
         """Ensure required fields with non-overridable default values are always populated.
 
         Certain fields are populated even if explicitly set as Null. This is an extra precaution as there is no
@@ -94,37 +92,37 @@ class TestAppointment:
 
         The current fields for which this is the case are:
         - id (primary key)
-        - created_at
-        - updated_at
         """
         user, service = self.create_appointment_entity_dependencies()
 
         appointment = Appointment.objects.create(
             # Required fields - Non overridable defaults
-            id=appointment_id,
-            created_at=created_at,
-            updated_at=updated_at,
+            id=None,
             # Required fields - No defaults
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             starts_at=self.starts_at,
             ends_at=self.ends_at,
             status=self.status,
             user=user,
             service=service,
         )
-        assert getattr(appointment, missing_value)
+        assert getattr(appointment, 'id')
 
 
     @pytest.mark.parametrize(
-            'starts_at,ends_at,status,existing_user,existing_service,missing_value',
+            'created_at,updated_at,starts_at,ends_at,status,existing_user,existing_service,missing_value',
             [
-                (None,ends_at,status,True,True,'starts_at'),
-                (starts_at,None,status,True,True,'ends_at'),
-                (starts_at,ends_at,None,True,True,'status'),
-                (starts_at,ends_at,status,False,True,'user_id'),
-                (starts_at,ends_at,status,True,False,'service_id'),
+                (None,updated_at,starts_at,ends_at,status,True,True,'created_at'),
+                (created_at,None,starts_at,ends_at,status,True,True,'updated_at'),
+                (created_at,updated_at,None,ends_at,status,True,True,'starts_at'),
+                (created_at,updated_at,starts_at,None,status,True,True,'ends_at'),
+                (created_at,updated_at,starts_at,ends_at,None,True,True,'status'),
+                (created_at,updated_at,starts_at,ends_at,status,False,True,'user_id'),
+                (created_at,updated_at,starts_at,ends_at,status,True,False,'service_id'),
             ]
     )
-    def test_required_fields_missing(self, starts_at, ends_at, status, existing_user, existing_service, missing_value):
+    def test_required_fields_missing(self, created_at, updated_at, starts_at, ends_at, status, existing_user, existing_service, missing_value):
         """
             Each iteration attempts creation with a missing required field (foreign keys inclusive).
 
@@ -141,6 +139,8 @@ class TestAppointment:
 
         with pytest.raises(IntegrityError) as missing_column_error:
             Appointment.objects.create(
+                created_at=created_at,
+                updated_at=updated_at,
                 starts_at=starts_at,
                 ends_at=ends_at,
                 status=status,
@@ -171,6 +171,8 @@ class TestAppointment:
         user, service = self.create_appointment_entity_dependencies()
 
         appointment = Appointment.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             starts_at=self.starts_at,
             ends_at=self.ends_at,
             status=self.status,
@@ -188,6 +190,8 @@ class TestAppointment:
                 pk=appointment_id,
                 confirmation_number=confirmation_number,
                 # Non-tested fields needed for object creation
+                created_at=self.created_at,
+                updated_at=self.updated_at,
                 starts_at=self.starts_at,
                 ends_at=self.ends_at,
                 status=self.status,

@@ -31,14 +31,14 @@ class Appointment(models.Model):
     Only database level validation should be defined in this class.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True, null=False)
-    updated_at = models.DateTimeField(auto_now=True, null=False)
+    created_at = models.DateTimeField(null=False)
+    updated_at = models.DateTimeField(null=False)
 
     starts_at = models.DateTimeField(null=False)
     ends_at = models.DateTimeField(null=False)
-    status = models.CharField(max_length=20, null=False)
+    status = models.CharField(null=False)
     confirmation_number = models.IntegerField(unique=True, null=True)
-    notes = models.CharField(max_length=200, null=True)
+    notes = models.CharField(null=True)
 
     # Relationships with foreign entities
     user = models.ForeignKey(

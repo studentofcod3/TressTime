@@ -14,8 +14,8 @@ class TestCustomUserModel:
 
     # Field values
     user_id = uuid.uuid4()
-    created_at = datetime.now()
-    updated_at = datetime.now()
+    created_at = make_aware_of_timezone(datetime.now())
+    updated_at = make_aware_of_timezone(datetime.now())
     username = 'test_username'
     email = 'test_email'
     password = 'test_password'
@@ -31,6 +31,8 @@ class TestCustomUserModel:
         Some of the required fields have default values, this test confirms they are present post creation.
         """
         custom_user = CustomUser.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             username=self.username,
             email=self.email,
             password=self.password
@@ -49,18 +51,14 @@ class TestCustomUserModel:
         assert not custom_user.is_superuser
 
     @pytest.mark.parametrize(
-        'user_id,created_at,updated_at,missing_value',
+        'user_id,missing_value',
         [
-            (None, created_at, updated_at, 'id'),
-            (user_id, None, updated_at, 'created_at'),
-            (user_id, created_at, None, 'updated_at'),
+            (None, 'id'),
         ]
     )
     def test_required_non_overridable_default_fields(
             self,
             user_id,
-            created_at,
-            updated_at,
             missing_value
     ):
         """Ensure required fields with non-overridable default values are always populated.
@@ -70,14 +68,12 @@ class TestCustomUserModel:
 
         The current fields for which this is the case are:
         - id (primary key)
-        - created_at
-        - updated_at
         """
         custom_user = CustomUser.objects.create(
             # Required fields - Non overridable defaults
             id=user_id,
-            created_at=created_at,
-            updated_at=updated_at,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             # Required fields - No defaults
             username=self.username,
             email=self.email,
@@ -86,19 +82,23 @@ class TestCustomUserModel:
         assert getattr(custom_user, missing_value)
 
     @pytest.mark.parametrize(
-        'username,email,password,date_joined,is_active,is_staff,is_superuser,missing_value',
+        'created_at,updated_at,username,email,password,date_joined,is_active,is_staff,is_superuser,missing_value',
         [
-            (None, email, password, date_joined, is_active, is_staff, is_superuser, 'username'),
-            (username, None, password, date_joined, is_active, is_staff, is_superuser, 'email'),
-            (username, email, None, date_joined, is_active, is_staff, is_superuser, 'password'),
-            (username, email, password, None, is_active, is_staff, is_superuser, 'date_joined'),
-            (username, email, password, date_joined, None, is_staff, is_superuser, 'is_active'),
-            (username, email, password, date_joined, is_active, None, is_superuser, 'is_staff'),
-            (username, email, password, date_joined, is_active, is_staff, None, 'is_superuser'),
+            (None, updated_at, username, email, password, date_joined, is_active, is_staff, is_superuser, 'created_at'),
+            (created_at, None, username, email, password, date_joined, is_active, is_staff, is_superuser, 'updated_at'),
+            (created_at, updated_at, None, email, password, date_joined, is_active, is_staff, is_superuser, 'username'),
+            (created_at, updated_at, username, None, password, date_joined, is_active, is_staff, is_superuser, 'email'),
+            (created_at, updated_at, username, email, None, date_joined, is_active, is_staff, is_superuser, 'password'),
+            (created_at, updated_at, username, email, password, None, is_active, is_staff, is_superuser, 'date_joined'),
+            (created_at, updated_at, username, email, password, date_joined, None, is_staff, is_superuser, 'is_active'),
+            (created_at, updated_at, username, email, password, date_joined, is_active, None, is_superuser, 'is_staff'),
+            (created_at, updated_at, username, email, password, date_joined, is_active, is_staff, None, 'is_superuser'),
         ]
     )
     def test_required_fields_missing(
             self,
+            created_at,
+            updated_at,
             username,
             email,
             password,
@@ -120,6 +120,8 @@ class TestCustomUserModel:
         """
         with pytest.raises(IntegrityError) as missing_column_error:
             CustomUser.objects.create(
+                created_at=created_at,
+                updated_at=updated_at,
                 username=username,
                 email=email,
                 password=password,
@@ -157,6 +159,8 @@ class TestCustomUserModel:
         - Add a row in the 'create' query.
         """
         custom_user = CustomUser.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             username=self.username,
             email=self.email,
             password=self.password
@@ -170,6 +174,8 @@ class TestCustomUserModel:
 
         with pytest.raises(IntegrityError) as unique_contraint_violation_error:
             CustomUser.objects.create(
+                created_at=self.created_at,
+                updated_at=self.updated_at,
                 pk=user_id,
                 username=username,
                 email=email,

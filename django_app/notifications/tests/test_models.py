@@ -12,30 +12,30 @@ from notifications.models import Notification
 
 @pytest.mark.django_db
 class TestNotification:
-    """This tests the Notification entity at the database level"""
-
-    # Field values for Notification entity
-    notification_id = uuid.uuid4()
+    """This tests the Notification entity at the database level."""
+    # Field values - Generic
     created_at = make_aware_of_timezone(datetime.now())
     updated_at = make_aware_of_timezone(datetime.now())
+
+    # Field values - Notification entity
+    notification_id = uuid.uuid4()
     notification_type = 'test_type'
     notification_status = 'test_status'
     notification_message = 'test message'
     notification_scheduled_send_datetime = make_aware_of_timezone(datetime.now())
     notification_priority = 'test_priority'
 
-
-    # Field values for dependency objects:
-    # User
+    # Field values - Dependency objects:
+    ## User
     username = 'test_username'
     email = 'test_email'
     password = 'test_password'
-    # Service
+    ## Service
     name = 'Test Service Name'
     description = 'Test Service Description'
     duration = 60
     price = 50
-    # Appointment
+    ## Appointment
     starts_at = make_aware_of_timezone(datetime.now() + timedelta(days=1))
     ends_at = make_aware_of_timezone(datetime.now() + timedelta(days=1, hours=1))
     appointment_status = 'test_status'
@@ -48,6 +48,8 @@ class TestNotification:
         """
 
         user = CustomUser.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             username=self.username,
             email=self.email,
             password=self.password
@@ -199,12 +201,16 @@ class TestNotification:
         """Test that any optional relationships are correctly added upon creation"""
         user = self.create_notification_entity_dependencies()
         service = Service.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             name=self.name,
             description=self.description,
             duration=self.duration,
             price=self.price
         )
         appointment = Appointment.objects.create(
+            created_at=self.created_at,
+            updated_at=self.updated_at,
             starts_at=self.starts_at,
             ends_at=self.ends_at,
             status=self.appointment_status,

@@ -42,15 +42,9 @@ class CustomUser(AbstractUser):
     built in form level validation (ie: required/blank). This is the same across all data models.
     """
 
-    # TODO: The logic for preventing editing of id will be addressed when implementing the repository pattern
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    # TODO:
-    #  The logic for handling `created_at` and `updated_at` will be addressed when implementing
-    #  the repository pattern. At that point the auto_now_add and auto_now properties are to be removed.
-    #  They are currently only kept so the that the initial automated tests can run on the model and provide
-    #  some degree of coverage.
-    created_at = models.DateTimeField(auto_now_add=True, null=False)
-    updated_at = models.DateTimeField(auto_now=True, null=False)
+    created_at = models.DateTimeField(null=False)
+    updated_at = models.DateTimeField(null=False)
     # Used ImageField as opposed to URLField as we want to ensure control, security, and a seamless user experience.
     profile_picture = models.ImageField(
         upload_to='profile_pictures/',
