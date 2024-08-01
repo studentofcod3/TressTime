@@ -22,10 +22,12 @@ class UserRepository(UserRepositoryInterface):
             return None
 
     
-    def update_user(self, user_id, user_data):
+    def update_user(self, user_id, user_data, partial=False):
         try:
             user = CustomUser.objects.get(id=user_id)
             for key, value in user_data.items():
+                if partial and value is None:
+                    continue
                 setattr(user, key, value)
             user.save()
             return user

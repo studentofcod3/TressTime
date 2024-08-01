@@ -42,12 +42,12 @@ class UserServiceValidator:
         else:
             self.validate_created_at(user_data.get('created_at', None))
             self.validate_updated_at(user_data.get('updated_at', None))
-        self.validate_username(user_data['username'])
-        self.validate_email(user_data['email'])
-        self.validate_password(user_data['password'])
-        self.validate_first_name(user_data['first_name'])
-        self.validate_last_name(user_data['last_name'])
-        self.validate_profile_picture(user_data['profile_picture'])
+        self.validate_username(user_data.get('username', None), is_update)
+        self.validate_email(user_data.get('email', None), is_update)
+        self.validate_password(user_data.get('password', None), is_update)
+        self.validate_first_name(user_data.get('first_name', None))
+        self.validate_last_name(user_data.get('last_name', None))
+        self.validate_profile_picture(user_data.get('profile_picture', None))
     
     def validate_created_at(self, created_at):
         """
@@ -79,23 +79,33 @@ class UserServiceValidator:
         if updated_at.tzinfo is None or updated_at.tzinfo.utcoffset(updated_at) is None:
             raise ValidationError("updated_at must be an aware datetime object with timezone information.")
         
-    def validate_username(self, username):
+    def validate_username(self, username, is_update=False):
         """Ensure the username meets the minimum length."""
+        if not username and not is_update:
+            raise ValidationError("username is required.")
+        if not username and is_update:
+            return
         if len(username) < 5:
             raise ValidationError("Username must be at least 5 characters long.")
     
-    def validate_email(self, email):
+    def validate_email(self, email, is_update=False):
         """Ensure that the submission is an email and that the email domain is whitelisted."""
-        if not email:
+        if not email and not is_update:
             raise ValidationError("email is required.")
+        if not email and is_update:
+            return
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             raise ValidationError("Invalid email address.")
         domain = email.split('@')[1]
         if domain not in self.ALLOWED_EMAIL_DOMAINS:
             raise ValidationError("Email domain is not allowed.")
 
-    def validate_password(self, password):
+    def validate_password(self, password, is_update=False):
         """Ensure that the password meets the specified requirements to maintain a secure password."""
+        if not password and not is_update:
+            raise ValidationError("password is required.")
+        if not password and is_update:
+            return
         if len(password) < 8:
             raise ValidationError("Password must be at least 8 characters long.")
         if not re.search(r"[A-Z]", password):
@@ -109,6 +119,8 @@ class UserServiceValidator:
 
     def validate_first_name(self, first_name):
         """Ensure that the first name only contains characters, and is within the specified length."""
+        if not first_name:
+            return
         if not first_name.isalpha():
             raise ValidationError("First name must contain only alphabetic characters.")
         if len(first_name) < 1 or len(first_name) > 30:
@@ -116,6 +128,8 @@ class UserServiceValidator:
 
     def validate_last_name(self, last_name):
         """Ensure that the last name only contains characters, and is within the specified length."""
+        if not last_name:
+            return
         if not last_name.isalpha():
             raise ValidationError("Last name must contain only alphabetic characters.")
         if len(last_name) < 1 or len(last_name) > 30:
@@ -123,6 +137,8 @@ class UserServiceValidator:
 
     def validate_profile_picture(self, profile_picture):
         """Ensure that the uploaded file is an image, verify its size, dimensions and file type."""
+        if not profile_picture:
+            return
         # Check if file is an image and if the MIME type is allowed
         if not profile_picture.content_type.startswith('image/') or profile_picture.content_type not in self.ALLOWED_IMAGE_TYPES:
             raise ValidationError("Uploaded file is not a supported image type")

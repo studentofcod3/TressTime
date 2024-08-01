@@ -36,21 +36,20 @@ class UserService(UserServiceInterface):
     def create_user(self, user_data):
         user_data['created_at'] = make_aware_of_timezone(datetime.now())
         user_data['updated_at'] = make_aware_of_timezone(datetime.now())
-        if not self.validator.validate_user_data(user_data):
-            raise ValidationError("Invalid user data provided.")
+        self.validator.validate_user_data(user_data)
         try:
             self.user_repository.create_user(user_data)
         except Exception as e:
             raise ValidationError(f"Error creating user: {e}")
 
-    def update_user(self, user_id, user_data):
+    def update_user(self, user_id, user_data, partial=False):
         user = self.user_repository.get_user_by_id(user_id)
         self.validator.validate_user_exists(user, user_id)
         # Set updated_at timestamp and validate data before updating.
         user_data['updated_at'] = make_aware_of_timezone(datetime.now())
         self.validator.validate_user_data(user_data, is_update=True)
         try:
-            return self.user_repository.update_user(user_id, user_data)
+            return self.user_repository.update_user(user_id, user_data, partial=partial)
         except Exception as e:
             raise ValidationError(f"Error updating user: {e}")
 
