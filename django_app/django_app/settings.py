@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'users',
     # Other apps
     'django_extensions',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -117,6 +118,16 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# API
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
 
 # Static files (CSS, JavaScript, Images)
 
