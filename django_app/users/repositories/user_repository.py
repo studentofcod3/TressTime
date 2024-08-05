@@ -17,14 +17,20 @@ class UserRepository(UserRepositoryInterface):
     
     def create_user(self, user_data):
         try:
-            return CustomUser.objects.create(**user_data)
+            user = CustomUser.objects.create(**user_data)
         except IntegrityError:
             return None
+        password = user_data.pop('password')
+        user.set_password(password)  # Hash the password
+        user.save()
+        return user
 
     
     def update_user(self, user_id, user_data, partial=False):
         try:
             user = CustomUser.objects.get(id=user_id)
+            if 'password' in user_data:
+                user.set_password(user_data.pop('password'))  # Hash the password if provided
             for key, value in user_data.items():
                 if partial and value is None:
                     continue
