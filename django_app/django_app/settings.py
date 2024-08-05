@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
+# Tell Django to use the CustomUser model defined in users module
+AUTH_USER_MODEL = 'users.CustomUser'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
