@@ -81,6 +81,9 @@ class TestUserRepository:
         }
         with patch.object(CustomUser.objects, 'create', return_value=mock_user) as mock_create:
             user = user_repository.create_user(user_data)
+            # We are removing the password from user_data in the repository to take advantage of Django's hashing
+            # Re-adding it here to ensure that it was called correctly.
+            user_data['password'] = 'testpassword'
             mock_create.assert_called_once_with(**user_data)
             assert user == mock_user
     
