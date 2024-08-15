@@ -32,8 +32,9 @@ INSTALLED_APPS = [
     'services',
     'users',
     # Other apps
-    'django_extensions',
-    'rest_framework',
+    'django_extensions', # Used in python's shell_plus
+    'rest_framework', 
+    'drf_yasg', # Swagger - used for documenting and testing API endpoints
 ]
 
 # Tell Django to use the CustomUser model defined in users module
